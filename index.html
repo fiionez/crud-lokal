@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Data Nilai</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #7171ff, #2d8fff, #0289ff);
+            flex-direction: column;
+        }
+
+        .content {
+            background: white;
+            width: 900px;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .kelola {
+            background: #f4f6ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .kelola form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .kelola input {
+            flex: 1;
+            height: 40px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 8px;
+        }
+
+        .kelola input:focus {
+            outline: none;
+            border-color: #2d8fff;
+        }
+
+        button {
+            background: #2d8fff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #1a6ed8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        th {
+            background: #2d8fff;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f1f5ff;
+        }
+
+.induk {
+    background-color: #0289ff;
+    width: 210px;
+    margin-bottom: 15rem;
+    gap: 1em;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    overflow-x: hidden;
+}
+
+.ketum {
+    display: flex;
+    gap: 1em;
+    animation: spin 7s linear infinite;
+}
+.ketum:hover {
+    animation-play-state: paused;
+}
+.induk::-webkit-scrollbar {
+    display: none;
+}
+
+.group {
+    background-color: #ccc;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: large;
+    box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes spin {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+</style>
+
+</head>
+
+<body>
+    <div class="induk">
+        <div class="ketum">
+            <div class="group">C</div>
+            <div class="group">R</div>
+            <div class="group">U</div>
+            <div class="group">D</div>
+    
+            <div class="group">C</div>
+            <div class="group">R</div>
+            <div class="group">U</div>
+            <div class="group">D</div>
+        </div>
+    </div>
+    <div class="content">
+
+        <div class="kelola">
+            <form>
+                <input type="text" id="nama" placeholder="Nama">
+                <input type="text" id="kelas" placeholder="Kelas">
+                <input type="text" id="nilai" placeholder="Nilai">
+                <button type="button" onclick="klik()" id="btn">Tambah</button>
+            </form>
+        </div>
+
+        <div id="result">
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Nama | Kelas</th>
+                        <th>Nilai</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tbody"></tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        let localdata = JSON.parse(localStorage.getItem('grade')) || [];
+        let editIndex = null
+        let data = []
+
+        const result = document.getElementById('tbody')
+
+        
+        function klik() {
+            
+            let namee = document.getElementById('nama').value
+            let jum = document.getElementById('kelas').value
+            let nila = document.getElementById('nilai').value
+
+            let users = {
+
+                nama: namee,
+                kelas: jum,
+                nilai: Number(nila),
+
+                getInfo() {
+                    return `${this.nama} | ${this.kelas}`
+                },
+
+                getGrade() {
+                    if (this.nilai >= 90) {
+                        return "A"
+                    }
+                    else if (this.nilai >= 75) {
+                        return "B"
+                    }
+                    else if (this.nilai >= 60) {
+                        return "C"
+                    }
+                    else {
+                        return "D"
+                    }
+                }
+
+            }
+
+            if (editIndex === null) {
+                data.push(users)
+                console.log(localdata)
+            } else {
+                data[editIndex] = users
+                editIndex = null
+            }
+
+            lihat()
+
+        }
+
+        function lihat() {
+
+            result.innerHTML = ""
+
+            data.forEach((item, index) => {
+
+                result.innerHTML += `
+<tr>
+<td>${item.getInfo()}</td>
+<td>${item.nilai}</td>
+<td>${item.getGrade()}</td>
+<td>${item.nilai >= 75 ? "Lulus" : "Tidak Lulus"}</td>
+<td><button onclick="edit(${index})">Edit</button></td>
+<td><button onclick="hapus(${index})">Delete</button></td>
+</tr>
+`
+
+            })
+
+        }
+
+        function hapus(index) {
+
+            data.splice(index, 1)
+            lihat()
+
+        }
+
+        function edit(index) {
+
+            let item = data[index]
+
+            document.getElementById("nama").value = item.nama
+            document.getElementById("kelas").value = item.kelas
+            document.getElementById("nilai").value = item.nilai
+
+            editIndex = index
+
+        }
+
+    </script>
+
+</body>
+
+</html>
